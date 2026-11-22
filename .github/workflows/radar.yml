@@ -27,7 +27,7 @@ jobs:
         env:
           RADAR_ID: IDR023
           BOM_EMAIL: wongxin@gmail.com
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site
       - id: deploy
