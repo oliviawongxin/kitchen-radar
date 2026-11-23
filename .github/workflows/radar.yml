@@ -2,7 +2,7 @@ name: radar
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/10 * * * *'   # backup only: GitHub runs this irregularly. Apps Script starts the job every 10 min
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: radar
-  cancel-in-progress: true
+  cancel-in-progress: false   # queue overlapping runs instead of cancelling (avoids false failure emails)
 
 jobs:
   publish:
@@ -31,4 +31,11 @@ jobs:
         with:
           path: site
       - id: deploy
+        uses: actions/deploy-pages@v5
+        continue-on-error: true   # GitHub sometimes glitches here; retry once below
+      - name: Wait before retrying
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 30
+      - id: deploy_retry
+        if: steps.deploy.outcome == 'failure'
         uses: actions/deploy-pages@v5
